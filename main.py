@@ -1,4 +1,5 @@
 import pygame
+from numpy import pi, cos, sin
 from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -71,9 +72,59 @@ def sphere():
     glPushMatrix()
     glColor3f(1.0, 1.0, 0.0)  # Kolor kuli
     glTranslatef(0, 0, -3)  # Przesunięcie kuli w przestrzeni
+    gluSphere(quad, 0.9, 32, 32)  # Rysowanie kuli
+    glPopMatrix()
+
+def sphere_tree():
+    quad = gluNewQuadric()
+    gluQuadricNormals(quad, GLU_SMOOTH)
+    gluQuadricTexture(quad, GL_TRUE)
+
+    glPushMatrix()
+    glColor3f(0.0, 0.4, 0.0)  # Kolor kuli
+    glTranslatef(0, 0, 0)  # Przesunięcie kuli w przestrzeni
     gluSphere(quad, 0.5, 32, 32)  # Rysowanie kuli
     glPopMatrix()
 
+def draw_cylinder(radius, height, num_segments):
+    glBegin(GL_QUAD_STRIP)
+
+    for i in range(num_segments + 1):
+        glColor3f(0.6, 0.4, 0.2)
+        theta = (2 * pi * i) / num_segments
+        x = radius * cos(theta)
+        y = radius * sin(theta)
+
+        glVertex3f(x, -1.75, y)
+        glVertex3f(x, height-1.75, y)
+
+    glEnd()
+
+    # Draw the bottom circle
+    glBegin(GL_TRIANGLE_FAN)
+    glVertex3f(0.0, -1.75, 0.0)  # Center of bottom circle
+    for i in range(num_segments + 1):
+        glColor3f(0.6, 0.4, 0.2)
+        theta = (2 * pi * i) / num_segments
+        x = radius * cos(theta)
+        y = radius * sin(theta)
+
+        glVertex3f(x, -1.75, y)
+
+    glEnd()
+
+    # Draw the top circle
+    glBegin(GL_TRIANGLE_FAN)
+    glVertex3f(0.0, height-1.75, 0.0)  # Center of top circle
+    for i in range(num_segments + 1):
+        glColor3f(0.6, 0.4, 0.2)
+        theta = (2 * pi * i) / num_segments
+        x = radius * cos(theta)
+        y = radius * sin(theta)
+
+        glVertex3f(x, height-1.75, y)
+
+    glEnd()
 
 def main():
     pygame.init()
@@ -93,9 +144,11 @@ def main():
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         glClearColor(0.7, 0.7, 1.0, 1.0)  # Tło niebieskie
-        #cube()
+        # cube()
         sphere()
         draw_rectangle()
+        draw_cylinder(0.2, 2, 100)
+        sphere_tree()
 
         pygame.display.flip()
         pygame.time.wait(10)
